@@ -5,6 +5,8 @@ import jsonp from 'jsonp';
 import logo from './logo.svg';
 import './App.css';
 
+var dateFormat = require('dateformat');
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -60,72 +62,77 @@ class App extends Component {
   }
 
   getIcon = (hourlyData) => {
-    let icon = hourlyData.icon;
-      switch (icon) {
-        case 'clear-day':
-          icon = `<i class="wi wi-day-sunny"></i>`;
-          break;
-        case 'clear-night':
-          icon = `<i class="wi wi-night-clear"></i>`;
-          break;
-        case 'rain':
-          icon = `<i class="wi wi-raindrops"></i>`;
-          break;
-        case 'snow':
-          icon = `<i class="wi wi-snow"></i>`;
-          break;
-        case 'sleet':
-          icon = `<i class="wi wi-sleet"></i>`;
-          break;
-        case 'wind':
-          icon = `<i class="wi wi-strong-wind"></i>`;
-          break;
-        case 'fog':
-          icon = `<i class="wi wi-fog"></i>`;
-          break;
-        case 'cloudy':
-        case 'partly-cloudy-day':
-        case 'partly-cloudy-night':
-          icon = `<i class="wi wi-cloudy"></i>`;
-          break;
-        default:
-          icon = `<i class="wi wi-na"></i>`;
-      }
-      return icon;
-  }
+    let icon = null;
+    switch (hourlyData.icon) {
+      case 'clear-day':
+        icon = <i className="wi wi-day-sunny"></i>;
+        break;
+      case 'clear-night':
+        icon = <i className="wi wi-night-clear"></i>;
+        break;
+      case 'rain':
+        icon = <i className="wi wi-raindrops"></i>;
+        break;
+      case 'snow':
+        icon = <i className="wi wi-snow"></i>;
+        break;
+      case 'sleet':
+        icon = <i className="wi wi-sleet"></i>;
+        break;
+      case 'wind':
+        icon = <i className="wi wi-strong-wind"></i>;
+        break;
+      case 'fog':
+        icon = <i className="wi wi-fog"></i>;
+        break;
+      case 'cloudy':
+      case 'partly-cloudy-day':
+      case 'partly-cloudy-night':
+        icon = <i className="wi wi-cloudy"></i>;
+        break;
+      default:
+        icon = <i className="wi wi-na"></i>;
+    }
+    return icon;
+  };
 
   render() {
-    let tableElem = null;
-    if (this.state.darkskyData.hourly !== undefined) {
-      tableElem = <table className="secondary-info table">
-          <tbody>
-            {this.state.darkskyData.hourly.data.map(function(obj, index) {
-                    console.log("obj.time: " + parseInt(obj.time));
-                    return (<tr key={index}>
-                      <td className='secondary-info-row table-time'><Moment unix format="ddd H:MM A">{obj.time}</Moment></td>
-                      <td className='secondary-info-row table-icon'>{this.getIcon(obj)}</td>
-                      <td className='secondary-info-row table-temp'>{obj.temperature}&deg;F</td>
-                    </tr>);
-                  })
-            }
-            <tr><td>latitude</td><td>{this.state.position.coords.latitude}</td></tr>
-            <tr><td>latitude</td><td>{this.state.position.coords.longitude}</td></tr>
-            <tr><td>city</td><td>{this.state.city}</td></tr>
-            <tr><td>prov</td><td>{this.state.prov}</td></tr>
-          </tbody>
-        </table>;
+    if (this.state.darkskyData.hourly === undefined) {
+      return <div></div>;
     }
+
+    let tableElem = null;
+    tableElem = <table className="secondary-info table">
+        <tbody>
+          {
+            this.state.darkskyData.hourly.data.map(function(obj, index) {
+              console.log("obj.time: " + parseInt(obj.time));
+              return (
+                <tr key={index}>
+                  <td className='secondary-info-row table-time'>{dateFormat(new Date(parseInt(obj.time)), "ddd H:MM TT")}</td>
+                  <td className='secondary-info-row table-icon'>{this.getIcon(obj)}</td>
+                  <td className='secondary-info-row table-temp'>{obj.temperature}&deg;F</td>
+                </tr>
+              );
+            }, this)
+          }
+          <tr><td>latitude</td><td>{this.state.position.coords.latitude}</td></tr>
+          <tr><td>latitude</td><td>{this.state.position.coords.longitude}</td></tr>
+          <tr><td>city</td><td>{this.state.city}</td></tr>
+          <tr><td>prov</td><td>{this.state.prov}</td></tr>
+        </tbody>
+      </table>;
 
     return (
       <div className="flex-box">        
         <div className="container text-center weather-main">
-          <p className="time"></p>
-          <p className="summary"></p>
-          <p className="city"></p>
-          <p className="temperature"></p>
+          <p className="time">{dateFormat(new Date(), "ddd H:MM TT")}</p>
+          <p className="summary">{this.state.darkskyData.currently.summary}</p>
+          <p className="city">this.state.city</p>
+          <p className="temperature">{Math.floor(this.state.darkskyData.currently.temperature)}&deg;F</p>
         </div>
         <div className="container weather-secondary">
-          <p className="hourly-tab"></p>
+          <p className="hourly-tab">Hourly</p>
           {tableElem}
         </div>
       </div>

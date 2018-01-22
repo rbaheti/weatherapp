@@ -1,5 +1,11 @@
 .App {
   text-align: center;
+  overflow-x: hidden;
+  color: whitesmoke;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .App-logo {
@@ -62,7 +68,7 @@ body {
   flex: 1;
   width: 100vw;
   color: #000000;
-  background-color: 'whitesmoke';
+  background-color: whitesmoke;
 }
 .hourly-tab {
   padding-top: 1rem;
@@ -106,5 +112,6 @@ td.table-icon, td.table-temp {
   to { transform: rotate(360deg); }
 }
 
-@import url("weather-icons-wind.min.css");
-@import url("weather-icons.min.css");
+@import url("css/bootstrap.min.css");
+@import url("css/weather-icons-wind.min.css");
+@import url("css/weather-icons.min.css");
