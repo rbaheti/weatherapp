@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import Moment from 'react-moment';
 import axios from 'axios';
 import jsonp from 'jsonp';
-import logo from './logo.svg';
+import clearDayPic from './pics/clearDay.jpeg';
+import clearNightPic from './pics/clearNight.jpeg';
+import cloudyPic from './pics/cloudy.jpeg';
+import fogPic from './pics/fog.jpg';
+import rainPic from './pics/rain.jpeg';
 import './App.css';
 
 var dateFormat = require('dateformat');
@@ -96,44 +100,75 @@ class App extends Component {
     return icon;
   };
 
+  getBackgroundImageUrl = (description) => {
+    let styleObj = {
+       backgroundImage: 'none',
+       backgroundRepeat  : 'no-repeat',
+    }
+    switch (description) {
+      case 'clear-day':
+        styleObj.backgroundImage = "url(" + clearDayPic + ")";
+        styleObj.backgroundPosition = "center center";
+        break;
+      case 'clear-night':
+        styleObj.backgroundImage = "url(" + clearNightPic + ")";
+        styleObj.backgroundPosition = "bottom center";
+        break;
+      case 'rain':
+        styleObj.backgroundImage = "url(" + rainPic + ")";
+        styleObj.backgroundPosition = "bottom center";
+        break;
+      case 'snow':
+        break;
+      case 'sleet':
+        break;
+      case 'wind':
+        break;
+      case 'fog':
+        styleObj.backgroundImage = "url(" + fogPic + ")";
+        styleObj.backgroundPosition = "50% 65%";
+        break;
+      case 'cloudy':
+      case 'partly-cloudy-day':
+      case 'partly-cloudy-night':
+        styleObj.backgroundImage = "url(" + cloudyPic + ")";
+        styleObj.backgroundPosition = "bottom center";
+        break;
+      default:;
+    }
+    return styleObj;
+  };
+
   render() {
     if (this.state.darkskyData.hourly === undefined) {
       return <div></div>;
     }
 
-    let tableElem = null;
-    tableElem = <table className="secondary-info table">
-        <tbody>
-          {
-            this.state.darkskyData.hourly.data.map(function(obj, index) {
-              console.log("obj.time: " + parseInt(obj.time));
-              return (
-                <tr key={index}>
-                  <td className='secondary-info-row table-time'>{dateFormat(new Date(parseInt(obj.time)), "ddd H:MM TT")}</td>
-                  <td className='secondary-info-row table-icon'>{this.getIcon(obj)}</td>
-                  <td className='secondary-info-row table-temp'>{obj.temperature}&deg;F</td>
-                </tr>
-              );
-            }, this)
-          }
-          <tr><td>latitude</td><td>{this.state.position.coords.latitude}</td></tr>
-          <tr><td>latitude</td><td>{this.state.position.coords.longitude}</td></tr>
-          <tr><td>city</td><td>{this.state.city}</td></tr>
-          <tr><td>prov</td><td>{this.state.prov}</td></tr>
-        </tbody>
-      </table>;
-
+    let tableRows = []
+    for (let index = 1; index < 5; index++) {
+      const obj = this.state.darkskyData.hourly.data[index];
+      tableRows.push(
+        <tr key={index}>
+          <td className='secondary-info-row table-time'>{dateFormat(new Date(parseInt(obj.time)), "ddd H:MM TT")}</td>
+          <td className='secondary-info-row table-icon'>{this.getIcon(obj)}</td>
+          <td className='secondary-info-row table-temp'>{Math.floor(obj.temperature)}&deg;F</td>
+        </tr>
+      );
+    }
+  
     return (
-      <div className="flex-box">        
-        <div className="container text-center weather-main">
+      <div className="flex-box">       
+        <div className="container text-center weather-main" style={this.getBackgroundImageUrl(this.state.darkskyData.currently.icon)}>
           <p className="time">{dateFormat(new Date(), "ddd H:MM TT")}</p>
           <p className="summary">{this.state.darkskyData.currently.summary}</p>
-          <p className="city">this.state.city</p>
+          <p className="city">{this.state.city} {this.state.prov}</p>
           <p className="temperature">{Math.floor(this.state.darkskyData.currently.temperature)}&deg;F</p>
         </div>
         <div className="container weather-secondary">
           <p className="hourly-tab">Hourly</p>
-          {tableElem}
+          <table className="secondary-info table">
+            <tbody>{tableRows}</tbody>
+          </table>
         </div>
       </div>
     );
