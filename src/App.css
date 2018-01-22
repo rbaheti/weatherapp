@@ -22,7 +22,89 @@
   font-size: large;
 }
 
+body {
+  overflow-x: hidden;
+  color: whitesmoke;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.flex-box {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.weather-main {
+  flex: 1;
+  padding-top: 2rem;
+  width: 100%;
+}
+.time {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
+  /*border: 2px solid red;*/
+
+}
+.summary {
+  font-size: 1.7em;
+  font-weight: bolder;
+}
+.city {
+  font-size: 1.4em;
+}
+.temperature {
+  font-size: 6em;
+  font-weight: bold;
+}
+.weather-secondary {
+  flex: 1;
+  width: 100vw;
+  color: #000000;
+  background-color: 'whitesmoke';
+}
+.hourly-tab {
+  padding-top: 1rem;
+  font-weight: bold;
+}
+.table td.secondary-info-row {
+  vertical-align: middle;
+}
+td.table-time {
+  width: 45%;
+}
+td.table-icon, td.table-temp {
+  width: 27.5%;
+}
+
+.table tr th {
+ border-bottom: 2px solid black; /* Change the color you want to set */
+ border-top: 2px solid black; /* Change the color you want to set */
+}
+
+.table tr td {
+ border-bottom: 1px solid lightGray; /* Change the color you want to set */
+ border-top: 1px solid lightGray; /* Change the color you want to set */
+}
+
+.loader {
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+@import url("weather-icons-wind.min.css");
+@import url("weather-icons.min.css");
