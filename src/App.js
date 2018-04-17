@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Moment from 'react-moment';
+import 'moment-timezone';
 import axios from 'axios';
 import jsonp from 'jsonp';
 import clearDayPic from './pics/clearDay.jpeg';
@@ -15,9 +16,9 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      position: {},
-      city: '',
-      prov: '',
+      position: null,
+      geolocationError: null,
+      geocodeData: {},
       darkskyData: {},
     }
   }
@@ -27,15 +28,19 @@ class App extends Component {
     let geolocationOptions = {
       enableHighAccuracy: false,
       maximumAge: Infinity,
+      timeout: 60 * 1000,
     };
+    this.setState({geolocationError: null});
     navigator.geolocation.getCurrentPosition((position) => {
+      console.log("geolocation done.");
       this.setState({position});
 
       // Find out user's city and province using their location.
       const geocodeAPI = 'https://geocoder.ca/?latt=' + this.state.position.coords.latitude + '&longt=' + this.state.position.coords.longitude + '&reverse=1&allna=1&geoit=xml&corner=1&json=1'
       axios.get(geocodeAPI)
         .then((data) => {
-          this.setState({city: data.data.city, prov: data.data.prov});
+          console.log("geocoder done.");
+          this.setState({geocodeData: data});
         })
         .catch((error) => {
           console.log(error);
@@ -48,6 +53,7 @@ class App extends Component {
         if (err) {
           console.error(err.message);
         } else {
+          console.log("darksky done.");
           this.setState({darkskyData: data});
           console.log(data.currently.time);
           console.log(data.currently.temperature);
@@ -56,6 +62,7 @@ class App extends Component {
       });
     },
     (error) => {
+      this.setState({geolocationError: error});
       console.log(error);
     },
     geolocationOptions);
@@ -140,16 +147,32 @@ class App extends Component {
   };
 
   render() {
-    if (this.state.darkskyData.hourly === undefined) {
-      return <div></div>;
+    if (this.state.geolocationError !== null) {
+      return (
+        <h1 className='top-header'>
+            Error in getting your lattitude and longitude.<br/>
+            Please do not block the app from getting your location.<br/>
+            We do not share your location with anyone.
+        </h1>
+      );
+    }
+    if (this.state.position === null) {
+      return <h1 className='top-header'>Getting your lattitude and longitude. Please be patient.</h1>;
+    }
+    if (this.state.darkskyData.hourly === undefined || this.state.geocodeData.data === undefined) {
+      return null;
     }
 
     let tableRows = []
-    for (let index = 1; index < 5; index++) {
+    for (let index = 0; index < 5; index++) {
       const obj = this.state.darkskyData.hourly.data[index];
+      const momentObj =
+        <Moment unix tz={this.state.geocodeData.data.TimeZone} format="ddd, MMM Do, ha" element="span">
+          {parseInt(obj.time, 10)}
+        </Moment>;
       tableRows.push(
         <tr key={index}>
-          <td className='secondary-info-row table-time'>{dateFormat(new Date(parseInt(obj.time)), "ddd H:MM TT")}</td>
+          <td className='secondary-info-row table-time'>{momentObj}</td>
           <td className='secondary-info-row table-icon'>{this.getIcon(obj)}</td>
           <td className='secondary-info-row table-temp'>{Math.floor(obj.temperature)}&deg;F</td>
         </tr>
@@ -159,13 +182,12 @@ class App extends Component {
     return (
       <div className="flex-box">       
         <div className="container text-center weather-main" style={this.getBackgroundImageUrl(this.state.darkskyData.currently.icon)}>
-          <p className="time">{dateFormat(new Date(), "ddd H:MM TT")}</p>
           <p className="summary">{this.state.darkskyData.currently.summary}</p>
-          <p className="city">{this.state.city} {this.state.prov}</p>
+          <p className="city">{this.state.geocodeData.data.city} {this.state.geocodeData.data.prov}</p>
           <p className="temperature">{Math.floor(this.state.darkskyData.currently.temperature)}&deg;F</p>
         </div>
         <div className="container weather-secondary">
-          <p className="hourly-tab">Hourly</p>
+          <p className="hourly-tab">Hourly Weather</p>
           <table className="secondary-info table">
             <tbody>{tableRows}</tbody>
           </table>

@@ -1,7 +1,6 @@
 .App {
   text-align: center;
   overflow-x: hidden;
-  color: whitesmoke;
   font-family: 'Open Sans', sans-serif;
   font-size: 1rem;
   font-weight: 400;
@@ -25,13 +24,20 @@
 }
 body {
   overflow-x: hidden;
-  color: whitesmoke;
   font-family: 'Open Sans', sans-serif;
+}
+.top-header {
+  text-align: center;
+  padding: 60px;
+  color: #000000;
+  background-color: whitesmoke;
+  line-height: 1.6;
 }
 .flex-box {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  color: whitesmoke;
 }
 .weather-main {
   flex: 1;
